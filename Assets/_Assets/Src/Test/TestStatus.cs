@@ -1,50 +1,30 @@
 ﻿using UnityEngine;
-using System.Collections;
 
+[System.Serializable]
 public class TestStatus : StoryStatus {
 
     public override StoryStatusModel GetStatus() {
-        StoryStatusEntryModel[] entries = new StoryStatusEntryModel[Random.Range(0, 3)];
+        var status = CreateModel();
 
         TestPlayerModel player = GetModel<TestPlayerModel>();
         TestShipModel ship = GetModel<TestShipModel>();
 
-        for (int i = 0; i < entries.Length; i++) {
-            entries[i] = new StoryStatusEntryModel {
-                name = "Test",
-                description = "This is a test entry",
-                status = "all is well"
-            };
+        for (int i = 0, count = Random.Range(0, 3); i < count; i++) {
+            status.AddEntry("Test", "This is a test entry", "all is well");
         }
 
-        StoryStatusStatModel[] stats = {
-            new StoryStatusStatModel {
-                id = "credit",
+        status.AddStat(
+            "credit", "credit", player.creditCount, 
+            "amount of credit your crew owns", "Thats a lot of dough", 
+            StoryStatusStatType.HEX, Color.black
+        );
 
-                name = "credit",
-                description = "amout of credit your crew owns",
-                status = "That's a lot of dough",
-                quantity = player.creditCount,
+        status.AddStat(
+            "combustible", "combustible", ship.combustible,
+            "fuel your ship uses to move", ship.combustible > 0 ? "sufficient stock" : "more required to travel",
+            StoryStatusStatType.SQUARE, Color.black
+        );
 
-                color = Color.black,
-                type = StoryStatusStatType.HEX
-            },
-            new StoryStatusStatModel {
-                id = "combustible",
-
-                name = "combustible",
-                description = "fuel your ship uses to move",
-                status = ship.combustible > 0 ? "sufficient stock" : "more required to travel",
-                quantity = ship.combustible,
-
-                color = Color.black,
-                type = StoryStatusStatType.SQUARE
-            }
-        };
-
-        return new StoryStatusModel {
-            entries = entries,
-            stats = stats
-        };
+        return status;
     }
 }

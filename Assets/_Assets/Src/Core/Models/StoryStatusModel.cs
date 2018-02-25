@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Collections.Generic;
 
 using UnityEngine;
 
@@ -14,6 +15,70 @@ public class StoryStatusModel {
 
     public StoryStatusEntryModel[] entries;
     public StoryStatusStatModel[] stats;
+
+    public StoryStatusModel() {
+
+    }
+
+    public StoryStatusModel(StoryStatusEntryModel[] entries, StoryStatusStatModel[] stats) {
+        this.entries = entries;
+        this.stats = stats;
+    }
+
+    public StoryStatusEntryModel AddEntry(string name, string description, string status) {
+        StoryStatusEntryModel entry = new StoryStatusEntryModel {
+            name = name,
+            description = description,
+            status = status
+        };
+
+        if(entries == null) {
+            entries = new StoryStatusEntryModel[] { entry };
+        } else {
+            List<StoryStatusEntryModel> newEntries = new List<StoryStatusEntryModel>(entries);
+
+            newEntries.Add(entry);
+
+            entries = newEntries.ToArray();
+        }
+
+        return entry;
+    }
+
+    public StoryStatusStatModel AddStat(string id, string name, int quantity, string description, string status, Sprite icon, Color color) {
+        return AddStat(id, name, quantity, description, status, icon, StoryStatusStatType.CIRCLE, color);
+    }
+
+    public StoryStatusStatModel AddStat(string id, string name, int quantity, string description, string status, StoryStatusStatType type, Color color) {
+        return AddStat(id, name, quantity, description, status, null, type, color);
+    }
+
+    StoryStatusStatModel AddStat(string id, string name, int quantity, string description, string status, Sprite icon, StoryStatusStatType type, Color color) {
+        StoryStatusStatModel stat = new StoryStatusStatModel {
+            id = id,
+
+            icon = icon,
+            type = type,
+            color = color,
+
+            name = name,
+            quantity = quantity,
+            description = description,
+            status = status
+        };
+
+        if(stats == null) {
+            stats = new StoryStatusStatModel[] { stat };
+        } else {
+            List<StoryStatusStatModel> newStats = new List<StoryStatusStatModel>(stats);
+
+            newStats.Add(stat);
+
+            stats = newStats.ToArray();
+        }
+
+        return stat;
+    }
 
     public void Validate() {
         if(entries != null) {

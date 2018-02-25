@@ -56,6 +56,11 @@ public class ChoiceView : MonoBehaviour {
             subText.text = model.requirementOrEffect;
         }
 
+        if(model.locked) {
+            text1.text = "<s>" + text1.text + "</s>";
+            text2.text = "<s>" + text2.text + "</s>";
+        }
+
         if (model.locked) {
             rect.color = PrefabStore.store.lockedChoiceColor;
             button.interactable = false;

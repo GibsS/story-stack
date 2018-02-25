@@ -1,53 +1,49 @@
-﻿[System.Serializable]
+﻿using System;
+
+[Serializable]
 public class TestStoryNode : StoryNode {
 
     public override StoryAction OnEnter() {
-        return StoryAction.Show(new TextStoryModel {
-            description = "Your ship is doing great, still cruising along."
-        }, a => StoryAction.Push(new ShopNode(), Test));
+        return Text("Your ship is doing great, still cruising along.", HandleOpenShop);
+    }
+
+    StoryAction HandleOpenShop(int _) {
+        return Push<ShopNode>(Test);
     }
 
     public StoryAction Test() {
-        return StoryAction.Show(new TextStoryModel {
-            description = "You feel happy with this exchange",
-            effects = new string[] { "+1 morale", "you ok now" }
-        }, choice => null);
+        return Text("You feel happy with this exchange", EndStory, "+1 morale", "you ok now");
     }
 }
 
+[Serializable]
 public class ShopNode : StoryNode {
 
     public override StoryAction OnEnter() {
-        return StoryAction.Show(new TextStoryModel {
-            description = "What looked like a shop from far away ended up being a shop when up close."
-        }, choice => Shop(), new TestStatus());
+        return Text("What looked like a shop from far away ended up being a shop when up close.", Shop, new TestStatus());
     }
 
-    public StoryAction Shop() {
-        return StoryAction.Show(new ChoiceStoryModel {
-            description = "The shop owner tells you to take a look at his merchandise.",
-            choiceDescription = "What do you wish to buy?",
+    public StoryAction Shop(int choice) {
+        var action = Choice("The shop owner tells you to take a look at his merchandise.", "What do you wish to buy?", ShopChoice);
 
-            duration = 0,
+        action.choice.duration = 0;
 
-            effects = null,
+        // 0
+        var buyChoice = action.AddChoice("buy combustible", "1 credit");
+        buyChoice.requirement = true;
+        buyChoice.locked = !GetSystem<TestSystem>().CanBuyCombustible();
 
-            choices = new ChoiceModel[] {
-                new ChoiceModel {
-                    id = 0,
-                    action = "buy combustible", requirementOrEffect = "1 credit",
-                    requirement = true, locked = !GetSystem<TestSystem>().CanBuyCombustible()
-                },
-                new ChoiceModel { id = 1, action = "buy nothing" }
-            },
-        }, Choice);
+        // 1
+        var buyNothingChoice = action.AddChoice("buy nothing");
+
+        return action;
     }
 
-    StoryAction Choice(int choice) {
+    StoryAction ShopChoice(int choice) {
         if(choice == 0) {
             GetSystem<TestSystem>().BuyCombustible();
 
-            StoryAction action = Shop();
+            StoryAction action = Shop(0);
 
             action.story.preventFade = true;
 
@@ -58,30 +54,22 @@ public class ShopNode : StoryNode {
     }
 
     StoryAction TimedChoice() {
-        return StoryAction.Show(new ChoiceStoryModel {
-            description = "Quick! Make a choice!",
+        var action = Choice("Quick! Make a choice!", "What will it be?", End);
 
-            choiceDescription = "What will it be?",
+        action.choice.duration = 100;
 
-            duration = 100,
+        action.AddChoice(0, "choice 1").locked = true;
+        action.AddChoice(1, "choice 2");
+        action.AddChoice(2, "choice 3");
 
-            choices = new ChoiceModel[] {
-                new ChoiceModel { id = 0, action = "choice 1", locked = true },
-                new ChoiceModel { id = 1, action = "choice 2" },
-                new ChoiceModel { id = 2, action = "choice 3" },
-                new ChoiceModel { id = 3, action = "choice 4", subChoices = new ChoiceModel[] {
-                    new ChoiceModel { id = 4, action = "sub choice 1" },
-                    new ChoiceModel { id = 5, action = "sub choice 2" }
-                } }
-            }
-        }, choice => End());
+        var choice4 = action.AddChoice(3, "choice 4");
+        choice4.AddChoice(4, "sub choice 1");
+        choice4.AddChoice(5, "sub choice 1");
+
+        return action;
     }
 
-    StoryAction End() {
-        return StoryAction.Show(new TextStoryModel {
-            description = "You leave",
-
-            effects = new string[] { "you bought some stuff" }
-        }, a => StoryAction.Pop());
+    StoryAction End(int _) {
+        return Text("You leave.", Pop, "you bought some stuff");
     }
 }

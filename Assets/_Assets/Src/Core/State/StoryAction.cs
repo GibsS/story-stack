@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Linq;
+using System.Collections.Generic;
+
+using UnityEngine;
 
 public enum StoryActionType {
    PUSH_STORY,
@@ -17,6 +21,9 @@ public class StoryAction {
     public Func<StoryAction> popCallback { get; private set; }
 
     public StoryStatus status { get; private set; }
+
+    public TextStoryModel text { get { return story as TextStoryModel; } }
+    public ChoiceStoryModel choice { get { return story as ChoiceStoryModel; } }
 
     private StoryAction() { }
 
@@ -49,5 +56,60 @@ public class StoryAction {
             popCallback = null,
             status = status
         };
+    }
+
+    public void AddEffect(string effect) {
+        if(story != null) {
+            if(story is TextStoryModel) {
+                List<string> effects = (story as TextStoryModel).effects.ToList();
+
+                effects.Add(effect);
+
+                (story as TextStoryModel).effects = effects.ToArray();
+            } else if(story is ChoiceStoryModel) {
+                List<string> effects = (story as ChoiceStoryModel).effects.ToList();
+
+                effects.Add(effect);
+
+                (story as ChoiceStoryModel).effects = effects.ToArray();
+            }
+        } else {
+            Debug.LogWarning("[StoryAction] Trying to add actions to an action without a story model");
+        }
+    }
+
+    public ChoiceModel AddChoice(int id, string action, string requirementOrEffect) {
+        if (story != null && story is ChoiceStoryModel) {
+            return (story as ChoiceStoryModel).AddChoice(id, action, requirementOrEffect);
+        } else {
+            Debug.LogWarning("[StoryAction] Can only add choices to a choice model");
+            return null;
+        }
+    }
+
+    public ChoiceModel AddChoice(string action, string requirementOrEffect) {
+        if (story != null && story is ChoiceStoryModel) {
+            return (story as ChoiceStoryModel).AddChoice(action, requirementOrEffect);
+        } else {
+            Debug.LogWarning("[StoryAction] Can only add choices to a choice model");
+            return null;
+        }
+    }
+
+    public ChoiceModel AddChoice(int id, string action) {
+        if (story != null && story is ChoiceStoryModel) {
+            return (story as ChoiceStoryModel).AddChoice(action, null);
+        } else {
+            Debug.LogWarning("[StoryAction] Can only add choices to a choice model");
+            return null;
+        }
+    }
+    public ChoiceModel AddChoice(string action) {
+        if (story != null && story is ChoiceStoryModel) {
+            return (story as ChoiceStoryModel).AddChoice(action, null);
+        } else {
+            Debug.LogWarning("[StoryAction] Can only add choices to a choice model");
+            return null;
+        }
     }
 }

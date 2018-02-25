@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 
 using UnityEngine;
 
@@ -38,5 +39,25 @@ public class ChoiceModel {
 
             subChoices = actualSubChoices.ToArray();
         }
+    }
+
+    public ChoiceModel AddChoice(int id, string action, string requirement = null) {
+        ChoiceModel newChoice = new ChoiceModel {
+            id = id,
+            action = action,
+            requirementOrEffect = requirement
+        };
+
+        if (subChoices == null) {
+            subChoices = new ChoiceModel[] { newChoice };
+        } else {
+            List<ChoiceModel> newChoices = subChoices.ToList();
+
+            newChoices.Add(newChoice);
+
+            subChoices = newChoices.ToArray();
+        }
+
+        return newChoice;
     }
 }
