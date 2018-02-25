@@ -4,84 +4,87 @@ using UnityEngine.UI;
 
 using TMPro;
 
-public class ChoiceView : MonoBehaviour {
+namespace StoryStack.Views {
 
-    public event Action<ChoiceModel> onClick;
+    public class ChoiceView : MonoBehaviour {
 
-    public Button button;
+        public event Action<ChoiceModel> onClick;
 
-    public TMP_Text text1;
-    public TMP_Text text2;
-    public TMP_Text subText;
+        public Button button;
 
-    public RectGraphic rect;
+        public TMP_Text text1;
+        public TMP_Text text2;
+        public TMP_Text subText;
 
-    ChoiceModel choice;
+        public RectGraphic rect;
 
-    ValueAnimator rippleAnimator;
+        ChoiceModel choice;
 
-    public void Initialize() {
-        rippleAnimator = ValueAnimator.Create(gameObject);
+        ValueAnimator rippleAnimator;
 
-        button.onClick.AddListener(() => {
-            rippleAnimator.QueueAnimation(1, 0.5f);
+        public void Initialize() {
+            rippleAnimator = ValueAnimator.Create(gameObject);
 
-            if (onClick != null) onClick(choice);
-        });
-    }
+            button.onClick.AddListener(() => {
+                rippleAnimator.QueueAnimation(1, 0.5f);
 
-    public void Setup(ChoiceModel model) {
-        choice = model;
+                if (onClick != null) onClick(choice);
+            });
+        }
 
-        if(string.IsNullOrEmpty(model.requirementOrEffect)) {
+        public void Setup(ChoiceModel model) {
+            choice = model;
+
+            if (string.IsNullOrEmpty(model.requirementOrEffect)) {
+                text1.gameObject.SetActive(true);
+                text2.gameObject.SetActive(false);
+                subText.gameObject.SetActive(false);
+
+                if (model.isMenu) {
+                    text1.text = "[" + model.action + "]";
+                } else {
+                    text1.text = model.action;
+                }
+            } else {
+                text1.gameObject.SetActive(false);
+                text2.gameObject.SetActive(true);
+                subText.gameObject.SetActive(true);
+
+                if (model.isMenu) {
+                    text2.text = "[" + model.action + "]";
+                } else {
+                    text2.text = model.action;
+                }
+                subText.text = model.requirementOrEffect;
+            }
+
+            if (model.locked) {
+                text1.text = "<s>" + text1.text + "</s>";
+                text2.text = "<s>" + text2.text + "</s>";
+            }
+
+            if (model.locked) {
+                rect.color = PrefabStore.store.lockedChoiceColor;
+                button.interactable = false;
+            } else if (model.requirement) {
+                rect.color = PrefabStore.store.requirementChoiceColor;
+                button.interactable = true;
+            } else if (model.isMenu) {
+                rect.color = PrefabStore.store.menuChoiceColor;
+                button.interactable = true;
+            } else {
+                rect.color = PrefabStore.store.normalChoiceColor;
+                button.interactable = true;
+            }
+        }
+        public void SetupAsBack() {
             text1.gameObject.SetActive(true);
             text2.gameObject.SetActive(false);
             subText.gameObject.SetActive(false);
 
-            if(model.isMenu) {
-                text1.text = "[" + model.action + "]";
-            } else {
-                text1.text = model.action;
-            }
-        } else {
-            text1.gameObject.SetActive(false);
-            text2.gameObject.SetActive(true);
-            subText.gameObject.SetActive(true);
-            
-            if (model.isMenu) {
-                text2.text = "[" + model.action + "]";
-            } else {
-                text2.text = model.action;
-            }
-            subText.text = model.requirementOrEffect;
-        }
-
-        if(model.locked) {
-            text1.text = "<s>" + text1.text + "</s>";
-            text2.text = "<s>" + text2.text + "</s>";
-        }
-
-        if (model.locked) {
-            rect.color = PrefabStore.store.lockedChoiceColor;
-            button.interactable = false;
-        } else if (model.requirement) {
-            rect.color = PrefabStore.store.requirementChoiceColor;
-            button.interactable = true;
-        } else if (model.isMenu) {
+            text1.text = "[Back]";
             rect.color = PrefabStore.store.menuChoiceColor;
             button.interactable = true;
-        } else {
-            rect.color = PrefabStore.store.normalChoiceColor;
-            button.interactable = true;
         }
-    }
-    public void SetupAsBack() {
-        text1.gameObject.SetActive(true);
-        text2.gameObject.SetActive(false);
-        subText.gameObject.SetActive(false);
-
-        text1.text = "[Back]";
-        rect.color = PrefabStore.store.menuChoiceColor;
-        button.interactable = true;
     }
 }

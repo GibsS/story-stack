@@ -5,138 +5,141 @@ using UnityEngine.UI;
 
 using TMPro;
 
-public class ChoiceStoryView : StoryView {
+namespace StoryStack.Views {
 
-    public event Action<int> onPick;
-    public event Action onTimeOut;
+    public class ChoiceStoryView : StoryView {
 
-    public TMP_Text descriptionText;
+        public event Action<int> onPick;
+        public event Action onTimeOut;
 
-    public TMP_Text choiceDescriptionText;
+        public TMP_Text descriptionText;
 
-    public GameObject effectContainer;
-    public GameObject effectTemplate;
+        public TMP_Text choiceDescriptionText;
 
-    public Image progressImage1;
-    public Image progressImage2;
+        public GameObject effectContainer;
+        public GameObject effectTemplate;
 
-    public ChoiceView[] choiceViews;
+        public Image progressImage1;
+        public Image progressImage2;
 
-    float startTime;
-    float endTime;
-    
-    bool inputSignaled;
+        public ChoiceView[] choiceViews;
 
-    Stack<ChoiceModel[]> choicesStack;
+        float startTime;
+        float endTime;
 
-    public override void Initialize() {
-        base.Initialize();
+        bool inputSignaled;
 
-        InitializeChoices();
+        Stack<ChoiceModel[]> choicesStack;
 
-        effectTemplate.SetActive(false);
-    }
+        public override void Initialize() {
+            base.Initialize();
 
-    public void Setup(ChoiceStoryModel model) {
-        choicesStack = new Stack<ChoiceModel[]>();
+            InitializeChoices();
 
-        descriptionText.text = model.description;
-
-        if (!string.IsNullOrEmpty(model.choiceDescription)) {
-            choiceDescriptionText.text = model.choiceDescription;
-        } else {
-            choiceDescriptionText.gameObject.SetActive(false);
+            effectTemplate.SetActive(false);
         }
 
-        if (model.effects != null) {
-            foreach (string effect in model.effects) {
-                GameObject obj = Instantiate(effectTemplate);
-                obj.transform.SetParent(effectContainer.transform, false);
-                obj.SetActive(true);
+        public void Setup(ChoiceStoryModel model) {
+            choicesStack = new Stack<ChoiceModel[]>();
 
-                TMP_Text text = obj.GetComponent<TMP_Text>();
-                text.text = effect;
+            descriptionText.text = model.description;
+
+            if (!string.IsNullOrEmpty(model.choiceDescription)) {
+                choiceDescriptionText.text = model.choiceDescription;
+            } else {
+                choiceDescriptionText.gameObject.SetActive(false);
+            }
+
+            if (model.effects != null) {
+                foreach (string effect in model.effects) {
+                    GameObject obj = Instantiate(effectTemplate);
+                    obj.transform.SetParent(effectContainer.transform, false);
+                    obj.SetActive(true);
+
+                    TMP_Text text = obj.GetComponent<TMP_Text>();
+                    text.text = effect;
+                }
+            }
+
+
+            if (model.duration != 0) {
+                progressImage1.gameObject.SetActive(true);
+                progressImage2.gameObject.SetActive(true);
+
+                startTime = Time.time;
+                endTime = Time.time + model.duration;
+            } else {
+                progressImage1.gameObject.SetActive(false);
+                progressImage2.gameObject.SetActive(false);
+                endTime = 1000000000000;
+            }
+
+            SetupChoices(model.choices);
+        }
+
+        void InitializeChoices() {
+            for (int i = 0; i < 4; i++) {
+                int a = i;
+                choiceViews[i].Initialize();
+
+                choiceViews[i].onClick += model => {
+                    if (choicesStack.Count > 1 && a == 0) {
+                        choicesStack.Pop();
+                        SetupChoices(choicesStack.Pop());
+                    } else {
+                        if (!model.isMenu) {
+                            if (onPick != null && !inputSignaled) {
+                                inputSignaled = true;
+                                onPick(model.id);
+                            }
+                        } else {
+                            SetupChoices(model.subChoices);
+                        }
+                    }
+                };
             }
         }
 
+        void SetupChoices(ChoiceModel[] choices) {
+            if (choicesStack.Count > 0) {
+                choiceViews[0].SetupAsBack();
 
-        if(model.duration != 0) {
-            progressImage1.gameObject.SetActive(true);
-            progressImage2.gameObject.SetActive(true);
+                for (int i = 0; i < 3; i++) {
+                    if (i < choices.Length) {
+                        choiceViews[i + 1].gameObject.SetActive(true);
 
-            startTime = Time.time;
-            endTime = Time.time + model.duration;
-        } else {
-            progressImage1.gameObject.SetActive(false);
-            progressImage2.gameObject.SetActive(false);
-            endTime = 1000000000000;
-        }
-
-        SetupChoices(model.choices);
-    }
-
-    void InitializeChoices() {
-        for(int i = 0; i < 4; i++) {
-            int a = i;
-            choiceViews[i].Initialize();
-
-            choiceViews[i].onClick += model => {
-                if (choicesStack.Count > 1 && a == 0) {
-                    choicesStack.Pop();
-                    SetupChoices(choicesStack.Pop());
-                } else {
-                    if (!model.isMenu) {
-                        if (onPick != null && !inputSignaled) {
-                            inputSignaled = true;
-                            onPick(model.id);
-                        }
+                        choiceViews[i + 1].Setup(choices[i]);
                     } else {
-                        SetupChoices(model.subChoices);
+                        choiceViews[i + 1].gameObject.SetActive(false);
                     }
                 }
-            };
-        }
-    }
+            } else {
+                for (int i = 0; i < 4; i++) {
+                    if (i < choices.Length) {
+                        choiceViews[i].gameObject.SetActive(true);
 
-    void SetupChoices(ChoiceModel[] choices) {
-        if (choicesStack.Count > 0) {
-            choiceViews[0].SetupAsBack();
-
-            for (int i = 0; i < 3; i++) {
-                if (i < choices.Length) {
-                    choiceViews[i + 1].gameObject.SetActive(true);
-
-                    choiceViews[i + 1].Setup(choices[i]);
-                } else {
-                    choiceViews[i + 1].gameObject.SetActive(false);
+                        choiceViews[i].Setup(choices[i]);
+                    } else {
+                        choiceViews[i].gameObject.SetActive(false);
+                    }
                 }
             }
-        } else {
-            for (int i = 0; i < 4; i++) {
-                if (i < choices.Length) {
-                    choiceViews[i].gameObject.SetActive(true);
 
-                    choiceViews[i].Setup(choices[i]);
-                } else {
-                    choiceViews[i].gameObject.SetActive(false);
-                }
+            choicesStack.Push(choices);
+        }
+
+        protected override void Update() {
+            base.Update();
+
+            if (progressImage1 != null && !inputSignaled) {
+                progressImage1.fillAmount = 1 - (Time.time - startTime) / (endTime - startTime);
+                progressImage2.fillAmount = 1 - (Time.time - startTime) / (endTime - startTime);
             }
-        }
 
-        choicesStack.Push(choices);
-    }
-
-    protected override void Update() {
-        base.Update();
-
-        if (progressImage1 != null && !inputSignaled) {
-            progressImage1.fillAmount = 1 - (Time.time - startTime) / (endTime - startTime);
-            progressImage2.fillAmount = 1 - (Time.time - startTime) / (endTime - startTime);
-        }
-
-        if(Time.time > endTime && !inputSignaled) {
-            inputSignaled = true;
-            onTimeOut();
+            if (Time.time > endTime && !inputSignaled) {
+                inputSignaled = true;
+                onTimeOut();
+            }
         }
     }
 }

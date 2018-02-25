@@ -1,17 +1,20 @@
 ﻿using System.Collections.Generic;
 using System;
 
-[Serializable]
-public class SaveModel {
+namespace StoryStack.Core {
 
-    public List<StoryNode> storyStack;
-    public List<StoryStatus> statusStack;
-    public List<string> popCallbackStack;
+    [Serializable]
+    public class SaveModel {
 
-    public string choiceCallback;
+        public List<StoryNode> storyStack;
+        public List<StoryStatus> statusStack;
+        public List<string> popCallbackStack;
 
-    public List<StoryModel> storyModels;
-    public Dictionary<string, StoryModel> idToStoryModels;
+        public string choiceCallback;
 
-    public int choice;
+        public List<StoryModel> storyModels;
+        public Dictionary<string, StoryModel> idToStoryModels;
+
+        public int choice;
+    }
 }

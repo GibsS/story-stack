@@ -1,9 +1,9 @@
-﻿using UnityEngine;
-using System.Collections;
+﻿namespace StoryStack {
 
-public abstract class StoryViewModel {
+    public abstract class StoryViewModel {
 
-    public bool preventFade;
+        public bool preventFade;
 
-    public abstract void Validate();
+        public abstract void Validate();
+    }
 }

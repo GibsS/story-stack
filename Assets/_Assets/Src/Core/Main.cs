@@ -1,5 +1,9 @@
 ﻿using UnityEngine;
 
+using StoryStack.Views;
+using StoryStack.Core;
+using StoryStack;
+
 /// <summary>
 /// A boilerplate top level object to manage the link between game logic, saves and views.
 /// </summary>

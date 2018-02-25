@@ -1,5 +1,8 @@
-﻿[System.Serializable]
-public abstract class StoryModel {
+﻿namespace StoryStack {
 
-    public abstract StoryModel Clone();
+    [System.Serializable]
+    public abstract class StoryModel {
+
+        public abstract StoryModel Clone();
+    }
 }

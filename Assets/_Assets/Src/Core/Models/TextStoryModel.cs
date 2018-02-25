@@ -3,34 +3,37 @@ using System.Collections.Generic;
 
 using UnityEngine;
 
-public class TextStoryModel : StoryViewModel {
+namespace StoryStack {
 
-    public string description;
+    public class TextStoryModel : StoryViewModel {
 
-    public string[] effects;
+        public string description;
 
-    public override void Validate() {
-        if(string.IsNullOrEmpty(description)) {
-            Debug.LogWarning("[TextStoryModel] Description can't be null");
-        }
+        public string[] effects;
 
-        if (effects != null && effects.Length > 4) {
-            Debug.LogWarning("[TextStoryModel] There can not be more than 4 choices");
-            effects = effects.Take(4).ToArray();
-        }
-
-        if (effects != null) {
-            List<string> actualEffects = new List<string>();
-
-            foreach (var effect in effects) {
-                if (string.IsNullOrEmpty(effect)) {
-                    Debug.LogWarning("[TextStoryModel] Effect can't be null or empty");
-                } else {
-                    actualEffects.Add(effect);
-                }
+        public override void Validate() {
+            if (string.IsNullOrEmpty(description)) {
+                Debug.LogWarning("[TextStoryModel] Description can't be null");
             }
 
-            effects = actualEffects.ToArray();
+            if (effects != null && effects.Length > 4) {
+                Debug.LogWarning("[TextStoryModel] There can not be more than 4 choices");
+                effects = effects.Take(4).ToArray();
+            }
+
+            if (effects != null) {
+                List<string> actualEffects = new List<string>();
+
+                foreach (var effect in effects) {
+                    if (string.IsNullOrEmpty(effect)) {
+                        Debug.LogWarning("[TextStoryModel] Effect can't be null or empty");
+                    } else {
+                        actualEffects.Add(effect);
+                    }
+                }
+
+                effects = actualEffects.ToArray();
+            }
         }
     }
 }

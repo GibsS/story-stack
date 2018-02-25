@@ -1,5 +1,7 @@
 ﻿using System;
 
+using StoryStack;
+
 [Serializable]
 public class TestStoryNode : StoryNode {
 

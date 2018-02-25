@@ -4,100 +4,103 @@ using UnityEngine;
 
 using TMPro;
 
-public class StatView : MonoBehaviour {
+namespace StoryStack.Views {
 
-    public string id { get; private set; }
+    public class StatView : MonoBehaviour {
 
-    public GameObject iconContainer;
-    public TMP_Text quantityText;
+        public string id { get; private set; }
 
-    public GameObject bumperGO;
-    public TMP_Text bumperText;
+        public GameObject iconContainer;
+        public TMP_Text quantityText;
 
-    RectTransform bumperRect;
+        public GameObject bumperGO;
+        public TMP_Text bumperText;
 
-    ValueAnimator bumpAnimator;
-    ValueAnimator valueAnimator;
+        RectTransform bumperRect;
 
-    float baseBumper;
+        ValueAnimator bumpAnimator;
+        ValueAnimator valueAnimator;
 
-    IconView iconView;
+        float baseBumper;
 
-    int cacheQuantity;
+        IconView iconView;
 
-    IEnumerator bumpAnimation;
+        int cacheQuantity;
 
-    public void Setup(StoryStatusStatModel model) {
-        bumperRect = bumperGO.GetComponent<RectTransform>();
+        IEnumerator bumpAnimation;
 
-        bumpAnimator = ValueAnimator.Create(gameObject);
-        valueAnimator = ValueAnimator.Create(gameObject);
+        public void Setup(StoryStatusStatModel model) {
+            bumperRect = bumperGO.GetComponent<RectTransform>();
 
-        baseBumper = bumperRect.anchoredPosition.y;
+            bumpAnimator = ValueAnimator.Create(gameObject);
+            valueAnimator = ValueAnimator.Create(gameObject);
 
-        id = model.id;
+            baseBumper = bumperRect.anchoredPosition.y;
 
-        GameObject iconGO = Instantiate(PrefabStore.store.icon);
-        iconGO.transform.SetParent(iconContainer.transform, false);
-        iconGO.transform.localPosition = Vector3.zero;
+            id = model.id;
 
-        iconView = iconGO.GetComponent<IconView>();
-        iconView.Setup(model);
+            GameObject iconGO = Instantiate(PrefabStore.store.icon);
+            iconGO.transform.SetParent(iconContainer.transform, false);
+            iconGO.transform.localPosition = Vector3.zero;
 
-        quantityText.text = model.quantity.ToString();
-        cacheQuantity = model.quantity;
+            iconView = iconGO.GetComponent<IconView>();
+            iconView.Setup(model);
 
-        valueAnimator.SetValue(model.quantity);
+            quantityText.text = model.quantity.ToString();
+            cacheQuantity = model.quantity;
 
-        bumperGO.SetActive(false);
-    }
+            valueAnimator.SetValue(model.quantity);
 
-    void Update() {
-        if (bumpAnimator != null && bumpAnimator.isAnimating) {
-            bumperRect.anchoredPosition = new Vector2(0, baseBumper + bumpAnimator.value);
+            bumperGO.SetActive(false);
         }
 
-        if (valueAnimator != null && valueAnimator.isAnimating) {
-            quantityText.text = ((int)valueAnimator.value).ToString();
-        }
-    }
-
-    public void UpdateValue(int value) {
-        if (value != cacheQuantity) {
-            if (bumpAnimation != null) {
-                StopCoroutine(bumpAnimation);
+        void Update() {
+            if (bumpAnimator != null && bumpAnimator.isAnimating) {
+                bumperRect.anchoredPosition = new Vector2(0, baseBumper + bumpAnimator.value);
             }
 
-            bumpAnimation = BumpValue(value);
-
-            StartCoroutine(bumpAnimation);
+            if (valueAnimator != null && valueAnimator.isAnimating) {
+                quantityText.text = ((int)valueAnimator.value).ToString();
+            }
         }
-    }
 
-    IEnumerator BumpValue(int newQuantity) {
-        bumperRect.anchoredPosition = new Vector2(0, baseBumper);
+        public void UpdateValue(int value) {
+            if (value != cacheQuantity) {
+                if (bumpAnimation != null) {
+                    StopCoroutine(bumpAnimation);
+                }
 
-        valueAnimator.ClearQueue();
-        valueAnimator.QueueAnimation(newQuantity, 0.5f);
+                bumpAnimation = BumpValue(value);
 
-        bumperGO.SetActive(false);
+                StartCoroutine(bumpAnimation);
+            }
+        }
 
-        int bumpValue = newQuantity - cacheQuantity;
+        IEnumerator BumpValue(int newQuantity) {
+            bumperRect.anchoredPosition = new Vector2(0, baseBumper);
 
-        cacheQuantity = newQuantity;
+            valueAnimator.ClearQueue();
+            valueAnimator.QueueAnimation(newQuantity, 0.5f);
 
-        yield return new WaitForSeconds(0.5f);
+            bumperGO.SetActive(false);
 
-        bumperText.text = (bumpValue > 0 ? "+" : "-") + Mathf.Abs(bumpValue).ToString();
+            int bumpValue = newQuantity - cacheQuantity;
 
-        bumpAnimator.ClearQueue();
-        bumpAnimator.SetValue(0);
-        bumpAnimator.QueueAnimation(-20, 1f);
+            cacheQuantity = newQuantity;
 
-        bumperGO.SetActive(true);
+            yield return new WaitForSeconds(0.5f);
 
-        yield return new WaitForSeconds(1.5f);
+            bumperText.text = (bumpValue > 0 ? "+" : "-") + Mathf.Abs(bumpValue).ToString();
 
-        bumperGO.SetActive(false);
+            bumpAnimator.ClearQueue();
+            bumpAnimator.SetValue(0);
+            bumpAnimator.QueueAnimation(-20, 1f);
+
+            bumperGO.SetActive(true);
+
+            yield return new WaitForSeconds(1.5f);
+
+            bumperGO.SetActive(false);
+        }
     }
 }

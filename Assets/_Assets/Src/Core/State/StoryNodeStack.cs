@@ -3,129 +3,147 @@ using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
 
-public class StoryNodeStack {
+namespace StoryStack.Core {
 
-    GameState state;
+    public class StoryNodeStack {
 
-    public Stack<StoryNode> stack;
-    public Stack<string> popCallbacks;
-    public Stack<StoryStatus> status;
+        GameState state;
 
-    public string choiceCallback;
+        public Stack<StoryNode> stack;
+        public Stack<string> popCallbacks;
+        public Stack<StoryStatus> status;
 
-    public StoryNodeStack(GameState state) {
-        this.state = state;
+        public string choiceCallback;
 
-        stack = new Stack<StoryNode>();
-        popCallbacks = new Stack<string>();
-        status = new Stack<StoryStatus>();
-    }
+        public StoryNodeStack(GameState state) {
+            this.state = state;
 
-    public StoryViewModel Start(StoryNode node) {
-        stack.Clear();
+            stack = new Stack<StoryNode>();
+            popCallbacks = new Stack<string>();
+            status = new Stack<StoryStatus>();
+        }
 
-        stack.Push(node);
-        Func<StoryAction> action = EndStory;
-        popCallbacks.Push(action.Method.Name);
-        status.Push(null);
+        public StoryViewModel Start(StoryNode node) {
+            stack.Clear();
 
-        node._Inject(state);
+            stack.Push(node);
+            Func<StoryAction> action = EndStory;
+            popCallbacks.Push(action.Method.Name);
+            status.Push(null);
 
-        return ProcessAction(node.OnEnter());
-    }
+            node._Inject(state);
 
-    StoryAction EndStory() {
-        return null;
-    }
+            return ProcessAction(node.OnEnter());
+        }
 
-    StoryViewModel ProcessAction(StoryAction action) {
-        if(action == null) {
-            Debug.Log("story is over");
+        StoryAction EndStory() {
             return null;
         }
 
-        if(action.type == StoryActionType.POP_STORY) {
-            stack.Pop();
-
-            StoryNode node = stack.Peek();
-
-            status.Pop();
-
-            if (node != null) {
-                Type type = node.GetType();
-
-                MethodInfo methodInfo = type.GetMethod(
-                    popCallbacks.Pop(),
-                    BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance,
-                    null,
-                    CallingConventions.Any,
-                    new Type[] { },
-                    null
-                );
-                
-                return ProcessAction(methodInfo.Invoke(node, new object[0]) as StoryAction);
-            } else {
+        StoryViewModel ProcessAction(StoryAction action) {
+            if (action == null) {
+                Debug.Log("story is over");
                 return null;
             }
-        } else if(action.type == StoryActionType.PUSH_STORY) {
-            stack.Push(action.node);
-            popCallbacks.Push(action.popCallback.Method.Name);
 
-            if (action.status != null) {
+            if (action.type == StoryActionType.POP_STORY) {
+                stack.Pop();
+
+                StoryNode node = stack.Peek();
+
                 status.Pop();
-                status.Push(action.status);
 
-                action.status._Inject(state);
+                if (node != null) {
+                    Type type = node.GetType();
+
+                    MethodInfo methodInfo = GetPopCallbackMethod(type, popCallbacks.Pop());
+
+                    return ProcessAction(methodInfo.Invoke(node, new object[0]) as StoryAction);
+                } else {
+                    return null;
+                }
+            } else if (action.type == StoryActionType.PUSH_STORY) {
+                if (GetPopCallbackMethod(stack.Peek().GetType(), action.popCallback.Method.Name) == null) {
+                    Debug.LogWarning("[StoryNodeStack] " + action.popCallback.Method.Name + " is not a method of " + stack.Peek().GetType().Name);
+                }
+
+                stack.Push(action.node);
+                popCallbacks.Push(action.popCallback.Method.Name);
+
+                if (action.status != null) {
+                    status.Pop();
+                    status.Push(action.status);
+
+                    action.status._Inject(state);
+                }
+
+                status.Push(null);
+
+                action.node._Inject(state);
+
+                return ProcessAction(action.node.OnEnter());
+            } else if (action.type == StoryActionType.SHOW_STORY) {
+                choiceCallback = action.choiceCallback.Method.Name;
+
+                if (GetChoiceCallbackMethod(stack.Peek().GetType(), choiceCallback) == null) {
+                    Debug.LogWarning("[StoryNodeStack] " + choiceCallback + " is not a method of " + stack.Peek().GetType().Name);
+                }
+
+                if (action.status != null) {
+                    status.Pop();
+                    status.Push(action.status);
+
+                    action.status._Inject(state);
+                }
+
+                return action.story;
             }
 
-            status.Push(null);
-
-            action.node._Inject(state);
-
-            return ProcessAction(action.node.OnEnter());
-        } else if(action.type == StoryActionType.SHOW_STORY) {
-            choiceCallback = action.choiceCallback.Method.Name;
-
-            if (action.status != null) {
-                status.Pop();
-                status.Push(action.status);
-
-                action.status._Inject(state);
-            }
-
-            return action.story;
+            return null;
         }
 
-        return null;
-    }
+        public StoryViewModel MakeChoice(int choice) {
+            StoryNode node = stack.Peek();
 
-    public StoryViewModel MakeChoice(int choice) {
-        StoryNode node = stack.Peek();
+            Type type = node.GetType();
 
-        Type type = node.GetType();
+            MethodInfo methodInfo = GetChoiceCallbackMethod(type, choiceCallback);
 
-        MethodInfo methodInfo = type.GetMethod(
-            choiceCallback,
-            BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance,
-            null,
-            CallingConventions.Any,
-            new Type[] { typeof(int) },
-            null
-        );
-
-        return ProcessAction(methodInfo.Invoke(node, new object[] { choice }) as StoryAction);
-    }
-
-    public StoryStatusModel GetStatus() {
-        StoryStatus[] statuses = status.ToArray();
-
-        for(int i = statuses.Length - 1; i >= 0; i--) {
-            if(statuses[i] != null) {
-                return statuses[i].GetStatus();
-            }
+            return ProcessAction(methodInfo.Invoke(node, new object[] { choice }) as StoryAction);
         }
 
-        return null;
-    }
+        public StoryStatusModel GetStatus() {
+            StoryStatus[] statuses = status.ToArray();
 
+            for (int i = statuses.Length - 1; i >= 0; i--) {
+                if (statuses[i] != null) {
+                    return statuses[i].GetStatus();
+                }
+            }
+
+            return null;
+        }
+
+        public MethodInfo GetPopCallbackMethod(Type type, string name) {
+            return type.GetMethod(
+                name,
+                BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance,
+                null,
+                CallingConventions.Any,
+                new Type[] { },
+                null
+            );
+        }
+
+        public MethodInfo GetChoiceCallbackMethod(Type type, string name) {
+            return type.GetMethod(
+                choiceCallback,
+                BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance,
+                null,
+                CallingConventions.Any,
+                new Type[] { typeof(int) },
+                null
+            );
+        }
+    }
 }

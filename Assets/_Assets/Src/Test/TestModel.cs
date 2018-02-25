@@ -1,4 +1,6 @@
-﻿[System.Serializable]
+﻿using StoryStack;
+
+[System.Serializable]
 public class TestPlayerModel : StoryModel {
     
     public int creditCount;

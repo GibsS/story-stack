@@ -1,75 +1,77 @@
 ﻿using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 using UnityEngine.UI;
 
 using TMPro;
 
-public class TextStoryView : StoryView {
+namespace StoryStack.Views {
 
-    const float DURATION_BEFORE_HINT = 20;
+    public class TextStoryView : StoryView {
 
-    public event Action onClick;
+        const float DURATION_BEFORE_HINT = 20;
 
-    public Button button;
-    public TMP_Text descriptionText;
-    public TMP_Text tapLabel;
+        public event Action onClick;
 
-    public GameObject effectContainer;
-    public GameObject effectTemplate;
+        public Button button;
+        public TMP_Text descriptionText;
+        public TMP_Text tapLabel;
 
-    ValueAnimator tapLabelAnimator;
+        public GameObject effectContainer;
+        public GameObject effectTemplate;
 
-    bool inputSignaled;
+        ValueAnimator tapLabelAnimator;
 
-    float appear;
+        bool inputSignaled;
 
-    public override void Initialize() {
-        base.Initialize();
+        float appear;
 
-        tapLabelAnimator = ValueAnimator.Create(gameObject, 0);
+        public override void Initialize() {
+            base.Initialize();
 
-        effectTemplate.gameObject.SetActive(false);
+            tapLabelAnimator = ValueAnimator.Create(gameObject, 0);
 
-        tapLabel.color = new Color(tapLabel.color.r, tapLabel.color.g, tapLabel.color.b, 0);
+            effectTemplate.gameObject.SetActive(false);
 
-        button.onClick.AddListener(() => {
-            if (onClick != null && !inputSignaled) {
-                inputSignaled = true;
+            tapLabel.color = new Color(tapLabel.color.r, tapLabel.color.g, tapLabel.color.b, 0);
 
-                onClick();
-            }
-        });
-    }
+            button.onClick.AddListener(() => {
+                if (onClick != null && !inputSignaled) {
+                    inputSignaled = true;
 
-    public void Setup(TextStoryModel model) {
-        appear = Time.time + DURATION_BEFORE_HINT;
-
-        descriptionText.text = model.description;
-
-        if (model.effects != null) {
-            foreach (string effect in model.effects) {
-                GameObject obj = Instantiate(effectTemplate);
-                obj.transform.SetParent(effectContainer.transform, false);
-                obj.SetActive(true);
-
-                TMP_Text text = obj.GetComponent<TMP_Text>();
-                text.text = effect;
-            }
-        }
-    }
-
-    protected override void Update() {
-        base.Update();
-
-        if(Time.time > appear) {
-            appear = 1000000000000;
-            tapLabelAnimator.QueueAnimation(1, 1);
+                    onClick();
+                }
+            });
         }
 
-        if(tapLabelAnimator.isAnimating) {
-            tapLabel.color = new Color(tapLabel.color.r, tapLabel.color.g, tapLabel.color.b, tapLabelAnimator.value);
+        public void Setup(TextStoryModel model) {
+            appear = Time.time + DURATION_BEFORE_HINT;
+
+            descriptionText.text = model.description;
+
+            if (model.effects != null) {
+                foreach (string effect in model.effects) {
+                    GameObject obj = Instantiate(effectTemplate);
+                    obj.transform.SetParent(effectContainer.transform, false);
+                    obj.SetActive(true);
+
+                    TMP_Text text = obj.GetComponent<TMP_Text>();
+                    text.text = effect;
+                }
+            }
+        }
+
+        protected override void Update() {
+            base.Update();
+
+            if (Time.time > appear) {
+                appear = 1000000000000;
+                tapLabelAnimator.QueueAnimation(1, 1);
+            }
+
+            if (tapLabelAnimator.isAnimating) {
+                tapLabel.color = new Color(tapLabel.color.r, tapLabel.color.g, tapLabel.color.b, tapLabelAnimator.value);
+            }
         }
     }
 }

@@ -1,44 +1,46 @@
 ﻿using UnityEngine;
-using System.Collections;
 
-public class StoryView : MonoBehaviour {
+namespace StoryStack.Views {
 
-    public CanvasGroup canvasGroup;
+    public class StoryView : MonoBehaviour {
 
-    ValueAnimator fadeAnimator;
+        public CanvasGroup canvasGroup;
 
-    public virtual void Initialize() {
-        fadeAnimator = ValueAnimator.Create(gameObject, 1);
-    }
+        ValueAnimator fadeAnimator;
 
-    protected virtual void Update() {
-        if(fadeAnimator.isAnimating) {
-            canvasGroup.alpha = fadeAnimator.value;
+        public virtual void Initialize() {
+            fadeAnimator = ValueAnimator.Create(gameObject, 1);
         }
-    }
 
-    public void Show(bool animate) {
-        if (!animate) {
-            fadeAnimator.ClearQueue();
-            fadeAnimator.SetValue(1);
-            canvasGroup.alpha = 1;
-        } else {
-            fadeAnimator.ClearQueue();
-            fadeAnimator.QueueAnimation(1, 0.5f);
+        protected virtual void Update() {
+            if (fadeAnimator.isAnimating) {
+                canvasGroup.alpha = fadeAnimator.value;
+            }
         }
-    }
-    public void Hide(bool animate) {
-        if (!animate) {
-            fadeAnimator.ClearQueue();
-            fadeAnimator.SetValue(0);
-            canvasGroup.alpha = 0;
-        } else {
-            fadeAnimator.ClearQueue();
-            fadeAnimator.QueueAnimation(0, 0.5f);
-        }
-    }
 
-    public void Destroy() {
-        Destroy(gameObject);
+        public void Show(bool animate) {
+            if (!animate) {
+                fadeAnimator.ClearQueue();
+                fadeAnimator.SetValue(1);
+                canvasGroup.alpha = 1;
+            } else {
+                fadeAnimator.ClearQueue();
+                fadeAnimator.QueueAnimation(1, 0.5f);
+            }
+        }
+        public void Hide(bool animate) {
+            if (!animate) {
+                fadeAnimator.ClearQueue();
+                fadeAnimator.SetValue(0);
+                canvasGroup.alpha = 0;
+            } else {
+                fadeAnimator.ClearQueue();
+                fadeAnimator.QueueAnimation(0, 0.5f);
+            }
+        }
+
+        public void Destroy() {
+            Destroy(gameObject);
+        }
     }
 }

@@ -2,13 +2,16 @@
 
 using TMPro;
 
-public class StatusEntryView : MonoBehaviour {
+namespace StoryStack.Views {
 
-    public TMP_Text descriptionText;
-    public TMP_Text statusText;
+    public class StatusEntryView : MonoBehaviour {
 
-    public void Setup(StoryStatusEntryModel model) {
-        descriptionText.text = StringUtility.FirstCharToUpper(model.name) + " - " + StringUtility.FirstCharToUpper(model.description);
-        statusText.text = StringUtility.FirstCharToUpper(model.status);
+        public TMP_Text descriptionText;
+        public TMP_Text statusText;
+
+        public void Setup(StoryStatusEntryModel model) {
+            descriptionText.text = StringUtility.FirstCharToUpper(model.name) + " - " + StringUtility.FirstCharToUpper(model.description);
+            statusText.text = StringUtility.FirstCharToUpper(model.status);
+        }
     }
 }

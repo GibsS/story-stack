@@ -4,26 +4,29 @@ using UnityEngine;
 
 using TMPro;
 
-public class StatEntryView : MonoBehaviour {
+namespace StoryStack.Views {
 
-    public GameObject iconContainer;
+    public class StatEntryView : MonoBehaviour {
 
-    IconView iconView;
+        public GameObject iconContainer;
 
-    public TMP_Text quantityText;
-    public TMP_Text descriptionText;
-    public TMP_Text statusText;
+        IconView iconView;
 
-    public void Setup(StoryStatusStatModel model) {
-        GameObject iconGO = Instantiate(PrefabStore.store.icon);
-        iconGO.transform.SetParent(iconContainer.transform, false);
-        iconGO.transform.localPosition = Vector3.zero;
+        public TMP_Text quantityText;
+        public TMP_Text descriptionText;
+        public TMP_Text statusText;
 
-        iconView = iconGO.GetComponent<IconView>();
-        iconView.Setup(model);
+        public void Setup(StoryStatusStatModel model) {
+            GameObject iconGO = Instantiate(PrefabStore.store.icon);
+            iconGO.transform.SetParent(iconContainer.transform, false);
+            iconGO.transform.localPosition = Vector3.zero;
 
-        quantityText.text = model.quantity.ToString();
-        descriptionText.text = StringUtility.FirstCharToUpper(model.name) + " - " + StringUtility.FirstCharToUpper(model.description);
-        statusText.text = StringUtility.FirstCharToUpper(model.status);
+            iconView = iconGO.GetComponent<IconView>();
+            iconView.Setup(model);
+
+            quantityText.text = model.quantity.ToString();
+            descriptionText.text = StringUtility.FirstCharToUpper(model.name) + " - " + StringUtility.FirstCharToUpper(model.description);
+            statusText.text = StringUtility.FirstCharToUpper(model.status);
+        }
     }
 }

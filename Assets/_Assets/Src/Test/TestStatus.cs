@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 
+using StoryStack;
+
 [System.Serializable]
 public class TestStatus : StoryStatus {
 
