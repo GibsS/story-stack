@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-using System.Text.RegularExpressions;
-
 public class GameState {
 
     public List<StoryModel> storyModels;
@@ -140,6 +138,10 @@ public class GameState {
         }
         
         storyModels = save.storyModels == null ? null : save.storyModels.ConvertAll(s => s.Clone());
+
+        // INJECTION
+        foreach(var s in save.storyStack) s._Inject(this);
+        foreach (var s in save.statusStack) if(s != null) s._Inject(this);
 
         return MakeChoice(save.choice);
     }

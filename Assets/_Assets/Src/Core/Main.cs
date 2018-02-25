@@ -9,8 +9,6 @@ public class Main : MonoBehaviour {
     GameState state;
 
     bool end;
-
-    SaveModel save;
     
     void Start() {
         store.Initialize();
@@ -31,10 +29,16 @@ public class Main : MonoBehaviour {
 
     void Update() {
         if(Input.GetKeyDown(KeyCode.Q)) {
-            save = state.CreateSave();
+            SaveModel save = state.CreateSave();
+
+            if (save != null) {
+                Serializer<SaveModel>.Save("test", save);
+            }
         }
 
         if(Input.GetKeyDown(KeyCode.D)) {
+            SaveModel save = Serializer<SaveModel>.Load("test");
+
             if (save != null) {
                 end = false;
                 var storyModel = state.LoadSave(save);
