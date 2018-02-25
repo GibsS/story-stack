@@ -51,14 +51,14 @@ public class GameState {
     public X GetSystem<X>() where X : StorySystem, new() {
         X system = new X();
 
-        system._Inject(this);
+        system._Inject(this, null);
 
         return system;
     }
     public X GetSystem<X>(string id) where X : StorySystem, new() {
         X system = new X();
 
-        system._Inject(this);
+        system._Inject(this, id);
 
         return system;
     }

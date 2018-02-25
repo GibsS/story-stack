@@ -1,5 +1,8 @@
 ﻿using UnityEngine;
 
+/// <summary>
+/// A boilerplate top level object to manage the link between game logic, saves and views.
+/// </summary>
 public class Main : MonoBehaviour {
 
     public GameView mainView;
