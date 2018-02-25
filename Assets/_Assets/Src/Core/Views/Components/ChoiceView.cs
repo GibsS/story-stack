@@ -14,12 +14,33 @@ public class ChoiceView : MonoBehaviour {
     public TMP_Text text2;
     public TMP_Text subText;
 
+    public RectGraphic ripple;
+
     ChoiceModel choice;
 
+    ValueAnimator rippleAnimator;
+
+    bool clicked;
+
     public void Initialize() {
+        rippleAnimator = ValueAnimator.Create(gameObject);
+
         button.onClick.AddListener(() => {
-            if (onClick != null) onClick(choice);
+            if (!clicked) {
+                clicked = true;
+
+                rippleAnimator.QueueAnimation(1, 0.5f);
+
+                if (onClick != null) onClick(choice);
+            }
         });
+    }
+
+    void Update() {
+        if(rippleAnimator.isAnimating) {
+            ripple.margin = rippleAnimator.value * 5;
+            ripple.lineWidth = (1 - rippleAnimator.value) * 2;
+        }
     }
 
     public void Setup(ChoiceModel model) {

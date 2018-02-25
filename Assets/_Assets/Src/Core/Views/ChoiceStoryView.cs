@@ -60,12 +60,14 @@ public class ChoiceStoryView : StoryView {
 
 
         if(model.duration != 0) {
-            progressImage1.gameObject.SetActive(false);
-            progressImage2.gameObject.SetActive(false);
+            progressImage1.gameObject.SetActive(true);
+            progressImage2.gameObject.SetActive(true);
 
             startTime = Time.time;
             endTime = Time.time + model.duration;
         } else {
+            progressImage1.gameObject.SetActive(false);
+            progressImage2.gameObject.SetActive(false);
             endTime = 1000000000000;
         }
 
@@ -127,8 +129,8 @@ public class ChoiceStoryView : StoryView {
         base.Update();
 
         if (progressImage1 != null) {
-            progressImage1.fillAmount = (Time.time - startTime) / (endTime - startTime);
-            progressImage2.fillAmount = (Time.time - startTime) / (endTime - startTime);
+            progressImage1.fillAmount = 1 - (Time.time - startTime) / (endTime - startTime);
+            progressImage2.fillAmount = 1 - (Time.time - startTime) / (endTime - startTime);
         }
 
         if(Time.time > endTime && !inputSignaled) {

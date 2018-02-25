@@ -53,11 +53,11 @@ public class StatView : MonoBehaviour {
     }
 
     void Update() {
-        if (bumpAnimator.isAnimating) {
+        if (bumpAnimator != null && bumpAnimator.isAnimating) {
             bumperRect.anchoredPosition = new Vector2(0, baseBumper + bumpAnimator.value);
         }
 
-        if (valueAnimator.isAnimating) {
+        if (valueAnimator != null && valueAnimator.isAnimating) {
             quantityText.text = ((int)valueAnimator.value).ToString();
         }
     }
@@ -88,11 +88,11 @@ public class StatView : MonoBehaviour {
 
         bumpAnimator.ClearQueue();
         bumpAnimator.SetValue(0);
-        bumpAnimator.QueueAnimation(-20, 0.8f);
+        bumpAnimator.QueueAnimation(-20, 1f);
 
         bumperGO.SetActive(true);
 
-        yield return new WaitForSeconds(0.8f);
+        yield return new WaitForSeconds(1.5f);
 
         bumperGO.SetActive(false);
 

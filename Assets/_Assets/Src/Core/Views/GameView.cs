@@ -23,6 +23,8 @@ public class GameView : MonoBehaviour {
         statusView.Initialize();
 
         statusView.onClick += HandleClickStatus;
+
+        statusView.Hide(false);
     }
 
     public void ShowStory(Tuple<StoryViewModel, StoryStatusModel> story, bool fade) {
@@ -44,25 +46,39 @@ public class GameView : MonoBehaviour {
             storyView = CreateStoryView(story.Item1);
             storyView.transform.SetParent(storyContainer.transform, false);
 
-            statusView.HalfReveal(false);
             if (story.Item2 != null) {
+                statusView.HalfReveal(false);
+
                 statusView.UpdateStatus(story.Item2);
+            } else {
+                statusView.Hide(false);
             }
         }
     }
 
     IEnumerator SwitchStoryAnimation(StoryViewModel story, StoryStatusModel status) {
+        UIPosition oldPosition = statusView.position;
+
         if(storyView != null) {
             storyView.Hide(true);
 
-            statusView.HalfReveal(true);
+            if (status != null) {
+                if(oldPosition == UIPosition.HIDDEN) {
+                    statusView.UpdateStatus(status);
+                }
+                statusView.HalfReveal(true);
+            } else {
+                statusView.Hide(true);
+            }
 
             yield return new WaitForSeconds(0.5f);
 
             storyView.Destroy();
         }
 
-        statusView.UpdateStatus(status);
+        if (status != null && oldPosition != UIPosition.HIDDEN) {
+            statusView.UpdateStatus(status);
+        }
 
         storyView = CreateStoryView(story);
         storyView.transform.SetParent(storyContainer.transform, false);

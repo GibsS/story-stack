@@ -6,7 +6,7 @@ public class TestStoryNode : StoryNode {
     public override StoryAction OnEnter() {
         return StoryAction.Show(new TextStoryModel {
             description = "Your ship is doing great, still cruising along."
-        }, a => StoryAction.Push(new ShopNode(), Test), new TestStatus());
+        }, a => StoryAction.Push(new ShopNode(), Test));
     }
 
     public StoryAction Test() {
@@ -21,7 +21,7 @@ public class ShopNode : StoryNode {
     public override StoryAction OnEnter() {
         return StoryAction.Show(new TextStoryModel {
             description = "What looked like a shop from far away ended up being a shop when up close."
-        }, choice => Shop());
+        }, choice => Shop(), new TestStatus());
     }
 
     public StoryAction Shop() {
@@ -46,13 +46,32 @@ public class ShopNode : StoryNode {
 
             return Shop();
         } else {
-            return End();
+            return TimedChoice();
         }
+    }
+
+    StoryAction TimedChoice() {
+        return StoryAction.Show(new ChoiceStoryModel {
+            description = "Quick! Make a choice!",
+
+            choiceDescription = "What will it be?",
+
+            duration = 10,
+
+            choices = new ChoiceModel[] {
+                new ChoiceModel { id = 0, action = "choice 1" },
+                new ChoiceModel { id = 1, action = "choice 2" },
+                new ChoiceModel { id = 2, action = "choice 3" },
+                new ChoiceModel { id = 3, action = "choice 4" }
+            }
+        }, choice => End());
     }
 
     StoryAction End() {
         return StoryAction.Show(new TextStoryModel {
-            description = "You leave"
+            description = "You leave",
+
+            effects = new string[] { "you bought some stuff" }
         }, a => StoryAction.Pop());
     }
 }
