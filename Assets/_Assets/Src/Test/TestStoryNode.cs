@@ -36,6 +36,9 @@ public class ShopNode : StoryNode {
         // 1
         var buyNothingChoice = action.AddChoice("buy nothing");
 
+        // 2
+        var backChoice = action.AddChoice("go to the back");
+
         return action;
     }
 
@@ -48,6 +51,10 @@ public class ShopNode : StoryNode {
             action.story.preventFade = true;
 
             return action;
+        } else if(choice == 1) {
+            return TimedChoice();
+        } else if(choice == 2) {
+            return Push(new ShopBackendNode(), TimedChoice);
         } else {
             return TimedChoice();
         }
@@ -71,5 +78,17 @@ public class ShopNode : StoryNode {
 
     StoryAction End(int _) {
         return Text("You leave.", Pop, "you bought some stuff");
+    }
+}
+
+[Serializable]
+public class ShopBackendNode : StoryNode {
+
+    public override StoryAction OnEnter() {
+        return Text("you check out the back of the store", End);
+    }
+
+    StoryAction End(int _) {
+        return Text("You go back to the main area", Pop);
     }
 }
