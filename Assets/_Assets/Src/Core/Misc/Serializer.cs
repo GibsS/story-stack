@@ -17,32 +17,46 @@ public class Serializer<X> where X : class {
     public static void Save(string name, X x) {
         new Serializer<X>(name).Save(x);
     }
+    public static void Clear(string name) {
+        new Serializer<X>(name).Clear();
+    }
 
     public X Load() {
+#if !UNITY_WEBGL
+        if (File.Exists(path)) {
+            BinaryFormatter bf = new BinaryFormatter();
+            FileStream file = File.Open(path, FileMode.Open);
 
-        BinaryFormatter bf = new BinaryFormatter();
-        FileStream file = File.Open(path, FileMode.Open);
+            X element = null;
 
-        X element = null;
+            try {
+                element = bf.Deserialize(file) as X;
+            } catch {
+                Debug.LogError("[CACHE - " + path + "] Failed to load cache.");
+            }
 
-        try {
-            element = bf.Deserialize(file) as X;
-        } catch {
-            Debug.LogError("[CACHE - " + path + "] Failed to load cache.");
+            file.Close();
+            return element;
+        } else {
+            return null;
         }
-
-        file.Close();
-        return element;
+#else
+        return null;
+#endif
     }
 
     public void Save(X element) {
+#if !UNITY_WEBGL
         BinaryFormatter bf = new BinaryFormatter();
         FileStream file = File.Create(path);
         bf.Serialize(file, element);
         file.Close();
+#endif
     }
 
-    public void ClearCache() {
-        File.Delete(path);
+    public void Clear() {
+        if (File.Exists(path)) {
+            File.Delete(path);
+        }
     }
 }

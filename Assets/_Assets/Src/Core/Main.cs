@@ -6,6 +6,8 @@ public class Main : MonoBehaviour {
 
     public PrefabStore store;
 
+    public bool deleteSave;
+
     GameState state;
 
     bool end;
@@ -17,7 +19,39 @@ public class Main : MonoBehaviour {
 
         mainView.onInput += HandleInput;
 
-        StartStory();
+        if(deleteSave) Serializer<SaveModel>.Clear("test");
+        
+        LoadStory();
+    }
+
+    void LoadStory() {
+        SaveModel save = Serializer<SaveModel>.Load("test");
+
+        if (save != null) {
+            end = false;
+            state = new GameState();
+
+            var storyModel = state.LoadSave(save);
+
+            if (storyModel.Item1 == null) {
+                end = true;
+                mainView.ShowStory(
+                    new Tuple<StoryViewModel, StoryStatusModel>(new TextStoryModel { description = "The end." }, null),
+                    true
+                );
+            } else {
+                mainView.ShowStory(storyModel, true && !storyModel.Item1.preventFade);
+            }
+        } else {
+            StartStory();
+        }
+    }
+    void SaveStory() {
+        SaveModel save = state.CreateSave();
+
+        if (save != null) {
+            Serializer<SaveModel>.Save("test", save);
+        }
     }
 
     void StartStory() {
@@ -29,23 +63,11 @@ public class Main : MonoBehaviour {
 
     void Update() {
         if(Input.GetKeyDown(KeyCode.Q)) {
-            SaveModel save = state.CreateSave();
-
-            if (save != null) {
-                Serializer<SaveModel>.Save("test", save);
-            }
+            SaveStory();
         }
 
         if(Input.GetKeyDown(KeyCode.D)) {
-            SaveModel save = Serializer<SaveModel>.Load("test");
-
-            if (save != null) {
-                end = false;
-                var storyModel = state.LoadSave(save);
-                mainView.ShowStory(storyModel, true && !storyModel.Item1.preventFade);
-            } else {
-                StartStory();
-            }
+            LoadStory();
         }
     }
 
@@ -63,5 +85,9 @@ public class Main : MonoBehaviour {
                 mainView.ShowStory(model, true && !model.Item1.preventFade);
             }
         }
+    }
+
+    void OnApplicationQuit() {
+        SaveStory();
     }
 }
