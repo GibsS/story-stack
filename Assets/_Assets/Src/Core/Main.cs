@@ -7,6 +7,8 @@ public class Main : MonoBehaviour {
     public PrefabStore store;
 
     GameState state;
+
+    bool end;
     
     void Start() {
         store.Initialize();
@@ -16,10 +18,24 @@ public class Main : MonoBehaviour {
         mainView.Initialize();
 
         mainView.onInput += HandleInput;
-        mainView.ShowStory(state.Start(new TestStoryNode()), true);
+
+        var storyModel = state.Start(new TestStoryNode());
+        mainView.ShowStory(storyModel, true && !storyModel.Item1.preventFade);
     }
 
     void HandleInput(int choice) {
-        mainView.ShowStory(state.MakeChoice(choice), true);
+        if (!end) {
+            var model = state.MakeChoice(choice);
+
+            if (model.Item1 == null) {
+                end = true;
+                mainView.ShowStory(
+                    new Tuple<StoryViewModel, StoryStatusModel>(new TextStoryModel { description = "The end." }, null), 
+                    true
+                );
+            } else {
+                mainView.ShowStory(model, true && !model.Item1.preventFade);
+            }
+        }
     }
 }

@@ -66,44 +66,50 @@ public class StatusView : MonoBehaviour {
         statusEntryTemplate.gameObject.SetActive(false);
 
         // Setup
-        foreach(StoryStatusStatModel stat in model.stats) {
-            StatView statView = null;
+        if (model.stats != null) {
+            foreach (StoryStatusStatModel stat in model.stats) {
+                StatView statView = null;
 
-            foreach(Transform t in statsContainer.transform) {
-                statView = t.GetComponent<StatView>();
+                foreach (Transform t in statsContainer.transform) {
+                    statView = t.GetComponent<StatView>();
 
-                if(statView.id == stat.id) {
-                    break;
+                    if (statView.id == stat.id) {
+                        break;
+                    } else {
+                        statView = null;
+                    }
+                }
+
+                if (statView != null) {
+                    statView.UpdateValue(stat.quantity);
                 } else {
-                    statView = null;
+                    GameObject go = Instantiate(statTemplate);
+                    go.transform.SetParent(statsContainer.transform, false);
+                    go.SetActive(true);
+
+                    go.GetComponent<StatView>().Setup(stat);
                 }
             }
+        }
 
-            if (statView != null) {
-                statView.UpdateValue(stat.quantity);
-            } else {
-                GameObject go = Instantiate(statTemplate);
-                go.transform.SetParent(statsContainer.transform, false);
+        if (model.entries != null) {
+            foreach (StoryStatusEntryModel entry in model.entries) {
+                GameObject go = Instantiate(statusEntryTemplate);
+                go.transform.SetParent(statusEntryContainer.transform, false);
                 go.SetActive(true);
 
-                go.GetComponent<StatView>().Setup(stat);
+                go.GetComponent<StatusEntryView>().Setup(entry);
             }
         }
 
-        foreach(StoryStatusEntryModel entry in model.entries) {
-            GameObject go = Instantiate(statusEntryTemplate);
-            go.transform.SetParent(statusEntryContainer.transform, false);
-            go.SetActive(true);
+        if (model.stats != null) {
+            foreach (StoryStatusStatModel stat in model.stats) {
+                GameObject go = Instantiate(statEntryTemplate);
+                go.transform.SetParent(statusEntryContainer.transform, false);
+                go.SetActive(true);
 
-            go.GetComponent<StatusEntryView>().Setup(entry);
-        }
-
-        foreach (StoryStatusStatModel stat in model.stats) {
-            GameObject go = Instantiate(statEntryTemplate);
-            go.transform.SetParent(statusEntryContainer.transform, false);
-            go.SetActive(true);
-
-            go.GetComponent<StatEntryView>().Setup(stat);
+                go.GetComponent<StatEntryView>().Setup(stat);
+            }
         }
     }
 

@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-[System.Serializable]
+﻿[System.Serializable]
 public class TestStoryNode : StoryNode {
 
     public override StoryAction OnEnter() {
@@ -11,7 +9,8 @@ public class TestStoryNode : StoryNode {
 
     public StoryAction Test() {
         return StoryAction.Show(new TextStoryModel {
-            description = "You feel happy with this exchange"
+            description = "You feel happy with this exchange",
+            effects = new string[] { "+1 morale", "you ok now" }
         }, choice => null);
     }
 }
@@ -48,7 +47,11 @@ public class ShopNode : StoryNode {
         if(choice == 0) {
             GetSystem<TestSystem>().BuyCombustible();
 
-            return Shop();
+            StoryAction action = Shop();
+
+            action.story.preventFade = true;
+
+            return action;
         } else {
             return TimedChoice();
         }

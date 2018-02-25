@@ -17,10 +17,30 @@ public class GameState {
     }
 
     public Tuple<StoryViewModel, StoryStatusModel> Start(StoryNode node) {
-        return new Tuple<StoryViewModel, StoryStatusModel>(storyStack.Start(node), storyStack.GetStatus());
+        StoryViewModel storyModel = storyStack.Start(node);
+        if (storyModel != null) {
+            storyModel.Validate();
+        }
+
+        StoryStatusModel statusModel = storyStack.GetStatus();
+        if (statusModel != null) {
+            statusModel.Validate();
+        }
+
+        return new Tuple<StoryViewModel, StoryStatusModel>(storyModel, statusModel);
     }
     public Tuple<StoryViewModel, StoryStatusModel> MakeChoice(int choice) {
-        return new Tuple<StoryViewModel, StoryStatusModel>(storyStack.MakeChoice(choice), storyStack.GetStatus());
+        StoryViewModel storyModel = storyStack.MakeChoice(choice);
+        if (storyModel != null) {
+            storyModel.Validate();
+        }
+
+        StoryStatusModel statusModel = storyStack.GetStatus();
+        if (statusModel != null) {
+            statusModel.Validate();
+        }
+
+        return new Tuple<StoryViewModel, StoryStatusModel>(storyModel, statusModel);
     }
 
     public X GetSystem<X>() where X : StorySystem, new() {

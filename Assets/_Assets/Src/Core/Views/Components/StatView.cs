@@ -82,9 +82,13 @@ public class StatView : MonoBehaviour {
 
         bumperGO.SetActive(false);
 
+        int bumpValue = newQuantity - cacheQuantity;
+
+        cacheQuantity = newQuantity;
+
         yield return new WaitForSeconds(0.5f);
 
-        bumperText.text = (newQuantity > cacheQuantity ? "+" : "-") + Mathf.Abs(newQuantity - cacheQuantity).ToString();
+        bumperText.text = (bumpValue > 0 ? "+" : "-") + Mathf.Abs(bumpValue).ToString();
 
         bumpAnimator.ClearQueue();
         bumpAnimator.SetValue(0);
@@ -95,7 +99,5 @@ public class StatView : MonoBehaviour {
         yield return new WaitForSeconds(1.5f);
 
         bumperGO.SetActive(false);
-
-        cacheQuantity = newQuantity;
     }
 }

@@ -71,7 +71,7 @@ public class GameView : MonoBehaviour {
                 statusView.Hide(true);
             }
 
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(0.4f);
 
             storyView.Destroy();
         }

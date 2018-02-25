@@ -51,7 +51,8 @@ public class TextStoryView : StoryView {
         if (model.effects != null) {
             foreach (string effect in model.effects) {
                 GameObject obj = Instantiate(effectTemplate);
-                obj.transform.SetParent(effectContainer.transform);
+                obj.transform.SetParent(effectContainer.transform, false);
+                obj.SetActive(true);
 
                 TMP_Text text = obj.GetComponent<TMP_Text>();
                 text.text = effect;

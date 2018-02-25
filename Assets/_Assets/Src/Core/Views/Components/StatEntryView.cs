@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System;
+
+using UnityEngine;
 
 using TMPro;
 
@@ -21,7 +23,7 @@ public class StatEntryView : MonoBehaviour {
         iconView.Setup(model);
 
         quantityText.text = model.quantity.ToString();
-        descriptionText.text = model.description;
-        statusText.text = model.status;
+        descriptionText.text = StringUtility.FirstCharToUpper(model.name) + " - " + StringUtility.FirstCharToUpper(model.description);
+        statusText.text = StringUtility.FirstCharToUpper(model.status);
     }
 }

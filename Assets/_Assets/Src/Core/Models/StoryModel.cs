@@ -1,6 +1,3 @@
-﻿using UnityEngine;
-using System.Collections;
-
-public abstract class StoryModel {
+﻿public abstract class StoryModel {
 
 }

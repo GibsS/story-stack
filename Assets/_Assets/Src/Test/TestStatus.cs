@@ -21,7 +21,8 @@ public class TestStatus : StoryStatus {
             new StoryStatusStatModel {
                 id = "credit",
 
-                description = "Credit - Amout of credit your crew owns",
+                name = "credit",
+                description = "amout of credit your crew owns",
                 status = "That's a lot of dough",
                 quantity = player.creditCount,
 
@@ -31,7 +32,8 @@ public class TestStatus : StoryStatus {
             new StoryStatusStatModel {
                 id = "combustible",
 
-                description = "Combustible - Fuel your ship uses to move",
+                name = "combustible",
+                description = "fuel your ship uses to move",
                 status = ship.combustible > 0 ? "sufficient stock" : "more required to travel",
                 quantity = ship.combustible,
 
