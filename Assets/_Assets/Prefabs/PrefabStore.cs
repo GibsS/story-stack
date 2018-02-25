@@ -19,4 +19,9 @@ public class PrefabStore : MonoBehaviour {
 
     public GameObject choiceStoryPrefab;
     public GameObject textStoryPrefab;
+
+    public Color normalChoiceColor;
+    public Color lockedChoiceColor;
+    public Color requirementChoiceColor;
+    public Color menuChoiceColor;
 }

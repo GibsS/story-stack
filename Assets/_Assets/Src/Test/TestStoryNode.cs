@@ -34,7 +34,11 @@ public class ShopNode : StoryNode {
             effects = null,
 
             choices = new ChoiceModel[] {
-                new ChoiceModel { id = 0, action = "buy combustible" },
+                new ChoiceModel {
+                    id = 0,
+                    action = "buy combustible", requirementOrEffect = "1 credit",
+                    requirement = true, locked = !GetSystem<TestSystem>().CanBuyCombustible()
+                },
                 new ChoiceModel { id = 1, action = "buy nothing" }
             },
         }, Choice);
@@ -56,13 +60,16 @@ public class ShopNode : StoryNode {
 
             choiceDescription = "What will it be?",
 
-            duration = 10,
+            duration = 100,
 
             choices = new ChoiceModel[] {
-                new ChoiceModel { id = 0, action = "choice 1" },
+                new ChoiceModel { id = 0, action = "choice 1", locked = true },
                 new ChoiceModel { id = 1, action = "choice 2" },
                 new ChoiceModel { id = 2, action = "choice 3" },
-                new ChoiceModel { id = 3, action = "choice 4" }
+                new ChoiceModel { id = 3, action = "choice 4", subChoices = new ChoiceModel[] {
+                    new ChoiceModel { id = 4, action = "sub choice 1" },
+                    new ChoiceModel { id = 5, action = "sub choice 2" }
+                } }
             }
         }, choice => End());
     }

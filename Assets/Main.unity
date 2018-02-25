@@ -1092,6 +1092,10 @@ MonoBehaviour:
     type: 2}
   textStoryPrefab: {fileID: 1309800505032864, guid: 89b5d235cbaf8fd41989ed61b36cd8c8,
     type: 2}
+  normalChoiceColor: {r: 0.2794118, g: 0.2794118, b: 0.2794118, a: 1}
+  lockedChoiceColor: {r: 0.6985294, g: 0.62527597, b: 0.21572232, a: 1}
+  requirementChoiceColor: {r: 0.25735295, g: 0.4775862, b: 1, a: 1}
+  menuChoiceColor: {r: 0.647, g: 0.647, b: 0.647, a: 1}
 --- !u!1 &733839717
 GameObject:
   m_ObjectHideFlags: 0

@@ -84,7 +84,7 @@ public class ChoiceStoryView : StoryView {
                     choicesStack.Pop();
                     SetupChoices(choicesStack.Pop());
                 } else {
-                    if (model.subChoices == null) {
+                    if (!model.isMenu) {
                         if (onPick != null && !inputSignaled) {
                             inputSignaled = true;
                             onPick(model.id);
@@ -128,7 +128,7 @@ public class ChoiceStoryView : StoryView {
     protected override void Update() {
         base.Update();
 
-        if (progressImage1 != null) {
+        if (progressImage1 != null && !inputSignaled) {
             progressImage1.fillAmount = 1 - (Time.time - startTime) / (endTime - startTime);
             progressImage2.fillAmount = 1 - (Time.time - startTime) / (endTime - startTime);
         }

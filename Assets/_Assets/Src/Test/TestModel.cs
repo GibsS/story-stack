@@ -2,7 +2,7 @@
 public class TestPlayerModel : StoryModel {
 
     public TestPlayerModel() {
-        creditCount = 200;
+        creditCount = 10;
     }
 
     public int creditCount;
