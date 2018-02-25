@@ -9,18 +9,40 @@ public class Main : MonoBehaviour {
     GameState state;
 
     bool end;
+
+    SaveModel save;
     
     void Start() {
         store.Initialize();
-
-        state = new GameState();
 
         mainView.Initialize();
 
         mainView.onInput += HandleInput;
 
+        StartStory();
+    }
+
+    void StartStory() {
+        state = new GameState();
+
         var storyModel = state.Start(new TestStoryNode());
         mainView.ShowStory(storyModel, true && !storyModel.Item1.preventFade);
+    }
+
+    void Update() {
+        if(Input.GetKeyDown(KeyCode.Q)) {
+            save = state.CreateSave();
+        }
+
+        if(Input.GetKeyDown(KeyCode.D)) {
+            if (save != null) {
+                end = false;
+                var storyModel = state.LoadSave(save);
+                mainView.ShowStory(storyModel, true && !storyModel.Item1.preventFade);
+            } else {
+                StartStory();
+            }
+        }
     }
 
     void HandleInput(int choice) {

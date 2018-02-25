@@ -23,7 +23,7 @@ public class ShopNode : StoryNode {
         return Text("What looked like a shop from far away ended up being a shop when up close.", Shop, new TestStatus());
     }
 
-    public StoryAction Shop(int choice) {
+    StoryAction Shop(int choice) {
         var action = Choice("The shop owner tells you to take a look at his merchandise.", "What do you wish to buy?", ShopChoice);
 
         action.choice.duration = 0;

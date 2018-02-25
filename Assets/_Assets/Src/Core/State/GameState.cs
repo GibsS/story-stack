@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+
+using System.Text.RegularExpressions;
 
 public class GameState {
 
@@ -8,6 +10,8 @@ public class GameState {
     public Dictionary<string, StoryModel> idToStoryModels;
 
     StoryNodeStack storyStack;
+
+    SaveModel previousState;
 
     public GameState() {
         storyModels = new List<StoryModel>();
@@ -30,6 +34,9 @@ public class GameState {
         return new Tuple<StoryViewModel, StoryStatusModel>(storyModel, statusModel);
     }
     public Tuple<StoryViewModel, StoryStatusModel> MakeChoice(int choice) {
+        previousState = _Save();
+        previousState.choice = choice;
+
         StoryViewModel storyModel = storyStack.MakeChoice(choice);
         if (storyModel != null) {
             storyModel.Validate();
@@ -81,5 +88,59 @@ public class GameState {
         }
 
         return model as X;
+    }
+
+    SaveModel _Save() {
+        Dictionary<string, StoryModel> saveIdToStories = new Dictionary<string, StoryModel>();
+
+        if (idToStoryModels != null) {
+            foreach (KeyValuePair<string, StoryModel> pair in idToStoryModels) {
+                saveIdToStories[pair.Key] = pair.Value.Clone();
+            }
+        }
+
+        List<StoryNode> saveStoryStack = new List<StoryNode>(storyStack.stack);
+        List<StoryStatus> saveStatusStack = new List<StoryStatus>(storyStack.status);
+        List<string> savePopCallbackStack = new List<string>(storyStack.popCallbacks);
+
+        saveStoryStack.Reverse();
+        saveStatusStack.Reverse();
+        savePopCallbackStack.Reverse();
+
+        return new SaveModel {
+            storyStack = saveStoryStack,
+            statusStack = saveStatusStack,
+            popCallbackStack = savePopCallbackStack,
+
+            choiceCallback = storyStack.choiceCallback,
+
+            storyModels = storyModels == null ? null : storyModels.ConvertAll(m => m.Clone()),
+            idToStoryModels = saveIdToStories
+        };
+    }
+    public SaveModel CreateSave() {
+        return previousState;
+    }
+
+    public Tuple<StoryViewModel, StoryStatusModel> LoadSave(SaveModel save) {
+        storyStack = new StoryNodeStack(this);
+
+        storyStack.stack = new Stack<StoryNode>(save.storyStack);
+        storyStack.status = new Stack<StoryStatus>(save.statusStack);
+        storyStack.popCallbacks = new Stack<string>(save.popCallbackStack);
+
+        storyStack.choiceCallback = save.choiceCallback;
+
+        idToStoryModels = new Dictionary<string, StoryModel>();
+
+        if (save.idToStoryModels != null) {
+            foreach (KeyValuePair<string, StoryModel> pair in save.idToStoryModels) {
+                idToStoryModels[pair.Key] = pair.Value.Clone();
+            }
+        }
+        
+        storyModels = save.storyModels == null ? null : save.storyModels.ConvertAll(s => s.Clone());
+
+        return MakeChoice(save.choice);
     }
 }
