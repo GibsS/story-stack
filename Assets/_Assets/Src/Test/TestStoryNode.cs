@@ -44,6 +44,10 @@ public class ShopNode : StoryNode {
         return action;
     }
 
+    StoryAction Shop() {
+        return Shop(0);
+    }
+
     StoryAction ShopChoice(int choice) {
         if(choice == 0) {
             GetSystem<TestSystem>().BuyCombustible();
@@ -56,7 +60,7 @@ public class ShopNode : StoryNode {
         } else if(choice == 1) {
             return TimedChoice();
         } else if(choice == 2) {
-            return Push(new ShopBackendNode(), TimedChoice);
+            return Push(new ShopBackendNode(), Shop);
         } else {
             return TimedChoice();
         }

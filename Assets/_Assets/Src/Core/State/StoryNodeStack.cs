@@ -31,6 +31,10 @@ namespace StoryStack.Core {
             popCallbacks.Push(action.Method.Name);
             status.Push(null);
 
+            if (!node.GetType().IsSerializable) {
+                Debug.LogWarning("[StoryNodeStack] StoryNode sub types need to be serializable but " + node.GetType().Name + " isn't.");
+            }
+
             node._Inject(state);
 
             return ProcessAction(node.OnEnter());
@@ -68,11 +72,20 @@ namespace StoryStack.Core {
                 }
 
                 stack.Push(action.node);
+
+                if(!action.node.GetType().IsSerializable) {
+                    Debug.LogWarning("[StoryNodeStack] StoryNode sub types need to be serializable but " + action.node.GetType().Name + " isn't.");
+                }
+
                 popCallbacks.Push(action.popCallback.Method.Name);
 
                 if (action.status != null) {
                     status.Pop();
                     status.Push(action.status);
+
+                    if (action.status != null && !action.status.GetType().IsSerializable) {
+                        Debug.LogWarning("[StoryNodeStack] StoryStatus sub types need to be serializable but " + action.status.GetType().Name + " isn't.");
+                    }
 
                     action.status._Inject(state);
                 }
@@ -92,6 +105,10 @@ namespace StoryStack.Core {
                 if (action.status != null) {
                     status.Pop();
                     status.Push(action.status);
+
+                    if(action.status != null && !action.status.GetType().IsSerializable) {
+                        Debug.LogWarning("[StoryNodeStack] StoryStatus sub types need to be serializable but " + action.status.GetType().Name + " isn't.");
+                    }
 
                     action.status._Inject(state);
                 }

@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 
+using UnityEngine;
+
 namespace StoryStack.Core {
 
     public class GameState {
@@ -70,6 +72,10 @@ namespace StoryStack.Core {
                 model = new X();
 
                 storyModels.Add(model);
+
+                if (!model.GetType().IsSerializable) {
+                    Debug.LogWarning("[StoryNodeStack] StoryModel sub types need to be serializable but " + model.GetType().Name + " isn't.");
+                }
             }
 
             return model as X;
@@ -83,6 +89,10 @@ namespace StoryStack.Core {
                 model = new X();
 
                 idToStoryModels[id] = model;
+
+                if (!model.GetType().IsSerializable) {
+                    Debug.LogWarning("[StoryNodeStack] StoryModel sub types need to be serializable but " + model.GetType().Name + " isn't.");
+                }
             }
 
             return model as X;
